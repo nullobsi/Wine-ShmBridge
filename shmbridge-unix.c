@@ -1,3 +1,7 @@
+// this is the most important define. This tells WINE that this module
+// is the UNIX-side module.
+#define WINE_UNIX_LIB
+
 #include <errno.h>
 #include <semaphore.h>
 #include <stdint.h>

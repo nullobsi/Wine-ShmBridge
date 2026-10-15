@@ -1,11 +1,11 @@
 # Where Wine is installed to
-WINE_DIR ?= /usr/local
+WINE_DIR ?= /usr
 # Include directory: contains wine/unixlib.h
 WINE_INCLUDE_DIR ?= $(WINE_DIR)/include
 
 # Windows vs UNIX C compiler
-MINGW_CC ?= x86_64-w64-mingw32-gcc
-NATIVE_CC ?= gcc
+WINE_CC ?= $(WINE_DIR)/bin/winegcc
+NATIVE_CC ?= cc
 VERSION ?= 0.0.1
 CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
@@ -14,23 +14,32 @@ WINE_INCLUDE = -I"$(WINE_INCLUDE_DIR)"
 
 .PHONY: all windows native clean
 .DELETE_ON_ERROR:
-all: windows native
+all: windows windows-compat native
 windows: shmbridge.dll
+windows-compat: shmbridge-compat.dll
 native: shmbridge.so
 
-shmbridge.dll: shmbridge-win.c unix_lib.c version.c version.h common.h shmbridge.def
-	$(MINGW_CC) -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
-		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' -shared \
+shmbridge.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
+	$(WINE_CC) -b x86_64-w64-mingw32 -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
 		shmbridge-win.c version.c unix_lib.c shmbridge.def \
-		$(LDFLAGS) -Wl,--exclude-all-symbols -lntdll -o $@
-	# Mark the PE as a Wine builtin, as winebuild --builtin does.
-	printf 'Wine builtin DLL\0' | dd of=$@ bs=32 seek=2 conv=sync,notrunc
+		$(LDFLAGS) \
+		-o $@
 
-# Wine uses the .so suffix even though this is a Mach-O dynamic library.
+shmbridge-compat.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
+	$(WINE_CC) -b x86_64-w64-mingw32 -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+		-DSHMBRIDGE_WINE_COMPAT -D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
+		shmbridge-win.c version.c unix_lib.c shmbridge.def \
+		-Wl,--wine-builtin $(LDFLAGS) \
+		-o $@
+
+# Wine uses the .so suffix, even on macOS.
 shmbridge.so: shmbridge-unix.c common.h posix-macos-sem-timedwait.h
-	$(NATIVE_CC) -arch x86_64 -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
-		-DWINE_UNIX_LIB -fPIC -fshort-wchar -fvisibility=hidden -shared \
-		shmbridge-unix.c $(LDFLAGS) -o $@
+	$(NATIVE_CC) -arch x86_64 -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+		-fPIC -fshort-wchar -fvisibility=hidden \
+		shmbridge-unix.c  \
+		$(LDFLAGS)  \
+		-o $@
 
 clean:
-	rm -f shmbridge.dll shmbridge.so
+	rm -f shmbridge.dll shmbridge.so shmbridge-compat.dll
