@@ -22,8 +22,8 @@ jobs:
         id: cache-crossover
         uses: actions/cache@v6
         with:
-          path: ${{ runner.temp }}/cx-build
-          key: crossover-${{ env.CX_SHA256 }}
+          path: ${{ github.workspace }}/.cx-sdk
+          key: crossover-sdk-${{ env.CX_SHA256 }}
 
       - name: Install CrossOver dependencies
         run: |
