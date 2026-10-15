@@ -36,7 +36,7 @@ shmbridge-compat.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 
 # Wine uses the .so suffix, even on macOS.
 shmbridge.so: shmbridge-unix.c common.h posix-macos-sem-timedwait.h
-	$(NATIVE_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+	$(NATIVE_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) -I"$(WINE_INCLUDE_DIR)/wine/windows" \
 		-fPIC -fshort-wchar -fvisibility=hidden \
 		shmbridge-unix.c  \
 		$(LDFLAGS)  \
