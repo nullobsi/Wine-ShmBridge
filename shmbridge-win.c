@@ -1,8 +1,7 @@
-#include "common.h"
-#include <stdint.h>
 #include <windows.h>
 #include <wine/unixlib.h>
 #include <winternl.h>
+#include "common.h"
 
 #ifndef SHMBRIDGE_WINE_COMPAT
 static const UNICODE_STRING shmbridge_so = RTL_CONSTANT_STRING(L"shmbridge.so");

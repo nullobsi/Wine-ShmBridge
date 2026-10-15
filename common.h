@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 /* POSIX says this is platform defined so let's just hard-code it for
  * the bridge. */
 #define SHMBRIDGE_SEM_FAILED ((void *)(intptr_t)-1)

@@ -11,7 +11,7 @@ VERSION ?= 0.0.1
 CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
 
-WINE_INCLUDE = -I"$(WINE_INCLUDE_DIR)"
+WINE_INCLUDE = -I"$(WINE_INCLUDE_DIR)" -I"$(WINE_INCLUDE_DIR)/wine/windows"
 
 .PHONY: all windows native clean
 .DELETE_ON_ERROR:
