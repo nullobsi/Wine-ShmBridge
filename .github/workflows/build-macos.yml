@@ -74,6 +74,9 @@ jobs:
             --without-gstreamer \
             --without-sdl
 
+      - name: Add WINE SDK to PATH
+        run: |
+          sdk="$GITHUB_WORKSPACE/.cx-sdk"
           echo "WINE_SDK=$sdk" >> "$GITHUB_ENV"
           echo "$sdk/bin" >> "$GITHUB_PATH"
 

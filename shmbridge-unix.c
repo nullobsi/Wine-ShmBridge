@@ -6,6 +6,7 @@
 #include <semaphore.h>
 #include <stdint.h>
 #include <ntstatus.h>
+#define WIN32_NO_STATUS
 #include <wine/unixlib.h>
 #include "common.h"
 
