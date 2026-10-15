@@ -5,6 +5,7 @@ WINE_INCLUDE_DIR ?= $(WINE_DIR)/include
 
 # Windows vs UNIX C compiler
 WINE_CC ?= $(WINE_DIR)/bin/winegcc
+MINGW_CC ?= x86_64-w64-mingw32
 NATIVE_CC ?= cc
 VERSION ?= 0.0.1
 CFLAGS ?= -O2 -Wall -Wextra
@@ -20,14 +21,14 @@ windows-compat: shmbridge-compat.dll
 native: shmbridge.so
 
 shmbridge.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
-	$(WINE_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
 		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
 		shmbridge-win.c version.c unix_lib.c shmbridge.def \
 		$(LDFLAGS) \
 		-o $@
 
 shmbridge-compat.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
-	$(WINE_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
 		-DSHMBRIDGE_WINE_COMPAT -D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
 		shmbridge-win.c version.c unix_lib.c shmbridge.def \
 		-Wl,--wine-builtin $(LDFLAGS) \
