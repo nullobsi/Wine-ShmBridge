@@ -23,14 +23,14 @@ native: shmbridge.so
 shmbridge.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
 		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
-		shmbridge-win.c version.c unix_lib.c shmbridge.def \
+		shmbridge-win.c version.c shmbridge.def \
 		$(LDFLAGS) \
 		-o $@
 
 shmbridge-compat.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
 		-DSHMBRIDGE_WINE_COMPAT -D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
-		shmbridge-win.c version.c unix_lib.c shmbridge.def \
+		shmbridge-win.c version.c shmbridge.def \
 		-Wl,--wine-builtin $(LDFLAGS) \
 		-o $@
 
