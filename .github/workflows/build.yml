@@ -28,5 +28,5 @@ jobs:
         with:
           name: wine-shmbridge
           path: |
-            '*.so'
-            '*.dll'
+            *.so
+            *.dll
