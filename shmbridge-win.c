@@ -8,12 +8,17 @@
 #endif
 
 #ifndef SHMBRIDGE_WINE_COMPAT
-static const UNICODE_STRING shmbridge_so = RTL_CONSTANT_STRING(SHMBRIDGE_TARGET_SO);
 static unixlib_module_t shmbridge_unix_module;
 static BOOL shmbridge_unix_loaded;
 #endif
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
+
+  WCHAR path[MAX_PATH];
+  WCHAR *slash;
+  UNICODE_STRING so_name;
+  DWORD len;
+
   switch (reason) {
   case DLL_PROCESS_ATTACH:
 #ifdef SHMBRIDGE_WINE_COMPAT
@@ -33,7 +38,36 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
      * find the .so file using its name. Much more flexible and uses
      * standard native DLL semantics, so no environment variable needed.
      */
-    if (__wine_load_unix_lib(&shmbridge_so, &shmbridge_unix_module,
+
+    len = GetModuleFileNameW(instance, path, ARRAY_SIZE(path));
+
+    // Hopefully, this never happens.
+    if (!len || len == ARRAY_SIZE(path))
+      return FALSE;
+
+    // This is probably going to be a Windows path, but you never really
+    // know.
+    slash = wcsrchr(path, L'\\');
+    if (!slash)
+      slash = wcsrchr(path, L'/');
+
+    // The module isn't loaded from a path??
+    if (!slash)
+      return FALSE;
+
+    // Another safety check. Technically, we don't know how long
+    // SHMBRIDGE_TARGET_SO is, and we don't want to exceed the max
+    // path...
+    slash++;
+    if ((SIZE_T)(slash - path) + wcslen(SHMBRIDGE_TARGET_SO) + 1 >
+        ARRAY_SIZE(path))
+      return FALSE;
+
+    wcscpy(slash, SHMBRIDGE_TARGET_SO);
+    RtlInitUnicodeString(&so_name, path);
+
+    // Directly try loading the .so file that is next to this .dll file.
+    if (__wine_load_unix_lib(&so_name, &shmbridge_unix_module,
                              &__wine_unixlib_handle))
       return FALSE;
     shmbridge_unix_loaded = TRUE;

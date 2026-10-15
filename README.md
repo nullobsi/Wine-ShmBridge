@@ -36,8 +36,18 @@ For WINE < 11.2, the PE .DLL file is compiled and marked as a WINE
 built-in. This means that the folder which contains it must be added to
 the `WINEDLLPATH` environment variable, otherwise it will not be loaded.
 In addition, a `.so` file with the same name must be present which WINE
-attempts to load automatically.
+attempts to load automatically. The following schemes work:
 
+```
+WINEDLLPATH/shmbridge-linux{.dll,.so}
+WINEDLLPATH/shmbridge-osx{.dll,.so}
+```
+
+or
+```
+WINEDLLPATH/x86_64-windows/shmbridge-{linux,osx}.dll
+WINEDLLPATH/x86_64-unix/shmbridge-{linux,osx}.osx
+```
 
 # To-Do
 
