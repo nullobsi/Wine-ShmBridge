@@ -10,6 +10,11 @@
 #include <wine/unixlib.h>
 #include "common.h"
 
+// Use shim on apple platforms
+#ifdef __APPLE__
+#include "posix-macos-sem-timedwait.h"
+#endif
+
 static NTSTATUS sem_open_unix_impl(void *args)
 {
 	struct sem_open_unix_params *params = args;
