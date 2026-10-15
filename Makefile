@@ -15,10 +15,15 @@ WINE_INCLUDE = -I"$(WINE_INCLUDE_DIR)" -I"$(WINE_INCLUDE_DIR)/wine/windows"
 
 .PHONY: all windows native clean
 .DELETE_ON_ERROR:
-all: windows windows-compat native
-windows: shmbridge.dll
-windows-compat: shmbridge-compat.dll
-native: shmbridge.so
+all: wine-builtin native-linux
+wine: shmbridge.dll
+wine-builtin: shmbridge-builtin.dll
+
+# There isn't really a difference here, but they need to be named
+# differently as there's no good way to automatically load the correct
+# one per platform.
+native-linux: shmbridge-linux.so
+native-osx: shmbridge-osx.so
 
 shmbridge.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
@@ -27,15 +32,22 @@ shmbridge.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 		$(LDFLAGS) \
 		-o $@
 
-shmbridge-compat.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
+shmbridge-builtin.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
 		-DSHMBRIDGE_WINE_COMPAT -D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
 		shmbridge-win.c version.c shmbridge.def \
 		-Wl,--wine-builtin $(LDFLAGS) \
 		-o $@
 
+shmbridge-linux.so: shmbridge-unix.c common.h
+	$(NATIVE_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+		-fPIC -fshort-wchar -fvisibility=hidden \
+		shmbridge-unix.c  \
+		$(LDFLAGS)  \
+		-o $@
+
 # Wine uses the .so suffix, even on macOS.
-shmbridge.so: shmbridge-unix.c common.h posix-macos-sem-timedwait.h
+shmbridge-osx.so: shmbridge-unix.c common.h posix-macos-sem-timedwait.h
 	$(NATIVE_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
 		-fPIC -fshort-wchar -fvisibility=hidden \
 		shmbridge-unix.c  \
