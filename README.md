@@ -9,16 +9,34 @@ This lets the programmer interface more directly with programs running within Wi
 Check the GitHub Actions file for a detailed guide on building the
 library. In particular, a WINE development environment is needed with
 `winegcc` and a proper `mingw-w64` compiler. Building is done with a
-Makefile. The Makefile contains 4 targets:
+Makefile. The Makefile contains multiple targets:
 
-- `wine` builds a PE DLL for use with WINE versions >= 11.2 without
-  special shenanigans.
-- `wine-builtin` builds a PE DLL marked as a WINE built-in for use with
-  WINE versions < 11.2. This requires the directory with the DLL to be
-  added to the `WINEDLLPATH` environment variable.
 - `native-linux` and `native-osx` build the same `.so` file but with a
   different name. This reduces ambiguity as the filename also denotes
   which platform it was built for.
+- `wine-builtin` builds a PE DLL marked as a WINE built-in for use with
+  WINE versions < 11.2. This requires the directory with the DLL to be
+  added to the `WINEDLLPATH` environment variable. The DLL is the same
+  for Linux and for macOS, but they should be named differently and put
+  in different locations with their corresponding native files to
+  prevent Linux from trying to load an OSX native and vice versa.
+- `wine-linux` and `wine-osx` both build a PE DLL for use with WINE versions >= 11.2 without
+  special shenanigans. They are named differently as they each try to
+  load their respective platform's native .so file.
+
+## Usage
+For WINE >= 11.2, the PE .DLL file automatically tries to load the
+appropriately named .so file next to it. The .so file it tries to load
+can be changed by setting the `SHMBRIDGE_SO_LINUX` or `SHMBRIDGE_SO_OSX`
+Makefile variable at compile-time. On Linux, this should be set to
+`shmbridge-linux.so`, and on macOS, this should be set to
+`shmbridge-osx.so`.
+
+For WINE < 11.2, the PE .DLL file is compiled and marked as a WINE
+built-in. This means that the folder which contains it must be added to
+the `WINEDLLPATH` environment variable, otherwise it will not be loaded.
+In addition, a `.so` file with the same name must be present which WINE
+attempts to load automatically.
 
 
 # To-Do

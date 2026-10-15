@@ -3,6 +3,10 @@ WINE_DIR ?= /usr
 # Include directory: contains wine/unixlib.h
 WINE_INCLUDE_DIR ?= $(WINE_DIR)/include
 
+# These can be changed if needed.
+SHMBRIDGE_SO_LINUX ?= shmbridge-linux.so
+SHMBRIDGE_SO_OSX ?= shmbridge-osx.so
+
 # Windows vs UNIX C compiler
 WINE_CC ?= $(WINE_DIR)/bin/winegcc
 MINGW_CC ?= x86_64-w64-mingw32
@@ -11,13 +15,16 @@ VERSION ?= 0.0.1
 CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
 
+SHMBRIDGE_SO_OSX_DEFINE = -DSHMBRIDGE_TARGET_SO='L"$(SHMBRIDGE_SO_OSX)"'
+SHMBRIDGE_SO_LINUX_DEFINE = -DSHMBRIDGE_TARGET_SO='L"$(SHMBRIDGE_SO_LINUX)"'
 WINE_INCLUDE = -I"$(WINE_INCLUDE_DIR)" -I"$(WINE_INCLUDE_DIR)/wine/windows"
 
 .PHONY: all windows native clean
 .DELETE_ON_ERROR:
 all: wine-builtin native-linux
-wine: shmbridge.dll
 wine-builtin: shmbridge-builtin.dll
+wine-linux: shmbridge-linux.dll
+wine-osx: shmbridge-osx.dll
 
 # There isn't really a difference here, but they need to be named
 # differently as there's no good way to automatically load the correct
@@ -25,9 +32,16 @@ wine-builtin: shmbridge-builtin.dll
 native-linux: shmbridge-linux.so
 native-osx: shmbridge-osx.so
 
-shmbridge.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
+shmbridge-linux.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
 	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
-		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' \
+		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' $(SHMBRIDGE_SO_LINUX_DEFINE) \
+		shmbridge-win.c version.c shmbridge.def \
+		$(LDFLAGS) \
+		-o $@
+
+shmbridge-osx.dll: shmbridge-win.c version.c version.h common.h shmbridge.def
+	$(WINE_CC) -b $(MINGW_CC) -shared -std=gnu17 $(CFLAGS) $(WINE_INCLUDE) \
+		-D__WINE_PE_BUILD -D__WINESRC__ -DWIN32_LEAN_AND_MEAN -DVERSION_INFO='"$(VERSION)"' $(SHMBRIDGE_SO_OSX_DEFINE) \
 		shmbridge-win.c version.c shmbridge.def \
 		$(LDFLAGS) \
 		-o $@

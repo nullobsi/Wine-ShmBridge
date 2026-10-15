@@ -3,8 +3,12 @@
 #include <winternl.h>
 #include "common.h"
 
+#ifndef SHMBRIDGE_TARGET_SO
+#define SHMBRIDGE_TARGET_SO L"shmbridge.so"
+#endif
+
 #ifndef SHMBRIDGE_WINE_COMPAT
-static const UNICODE_STRING shmbridge_so = RTL_CONSTANT_STRING(L"shmbridge.so");
+static const UNICODE_STRING shmbridge_so = RTL_CONSTANT_STRING(SHMBRIDGE_TARGET_SO);
 static unixlib_module_t shmbridge_unix_module;
 static BOOL shmbridge_unix_loaded;
 #endif
