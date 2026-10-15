@@ -39,7 +39,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/cx-source"
 
           curl --fail --location --retry 3 \
-            "https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CX_VERSION}.tar.gz"
+            "https://media.codeweavers.com/pub/crossover/source/crossover-sources-${CX_VERSION}.tar.gz" \
             -o "$RUNNER_TEMP/crossover.tar.gz"
 
           printf '%s  %s\n' \
