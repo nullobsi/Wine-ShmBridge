@@ -43,7 +43,7 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved) {
     if (!reserved && shmbridge_unix_loaded) {
       // We don't really care about the result anymore. The DLL is
       // being unloaded and the return value at this point is ignored. Goodbye!
-      (void)__wine_unload_unix_lib(shmbridge_unix_module));
+      (void)__wine_unload_unix_lib(shmbridge_unix_module);
       shmbridge_unix_loaded = FALSE;
       shmbridge_unix_module = 0;
       __wine_unixlib_handle = 0;
