@@ -49,6 +49,12 @@ WINEDLLPATH/x86_64-windows/shmbridge-{linux,osx}.dll
 WINEDLLPATH/x86_64-unix/shmbridge-{linux,osx}.osx
 ```
 
+Note that the `builtin` DLL files work on WINE >= 11.2 as well, however,
+they maintain all the same limitations of needing to be placed in the
+`WINEDLLPATH`. As WINE versions mature, the hope is that the newer
+interface becomes more supported, such that the environment variable
+hack is no longer needed.
+
 # To-Do
 
 - [x] Semaphores
