@@ -17,10 +17,11 @@ jobs:
           sudo dnf config-manager addrepo -y --from-repofile=https://dl.winehq.org/wine-builds/fedora/44/winehq.repo
           sudo dnf group install -y development-tools
           sudo dnf install -y wine-staging wine-staging-devel gcc-c++ mingw64-gcc mingw64-gcc-c++
+          echo "/opt/wine-staging/bin" >> "$GITHUB_PATH"
 
       - name: Build project
         run: |
-          make wine wine-builtin native-linux
+          make WINE_DIR=/opt/wine-staging wine wine-builtin native-linux
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
