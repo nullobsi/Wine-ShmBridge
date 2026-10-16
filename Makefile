@@ -11,7 +11,7 @@ SHMBRIDGE_SO_OSX ?= shmbridge-osx.so
 WINE_CC ?= $(WINE_DIR)/bin/winegcc
 MINGW_CC ?= x86_64-w64-mingw32
 NATIVE_CC ?= cc
-VERSION ?= 0.0.1
+VERSION ?= 1.1.0
 CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
 
@@ -19,7 +19,7 @@ SHMBRIDGE_SO_LINUX_DEFINE = -DSHMBRIDGE_TARGET_SO='L"$(SHMBRIDGE_SO_LINUX)"'
 SHMBRIDGE_SO_OSX_DEFINE = -DSHMBRIDGE_TARGET_SO='L"$(SHMBRIDGE_SO_OSX)"'
 WINE_INCLUDE = -I"$(WINE_INCLUDE_DIR)" -I"$(WINE_INCLUDE_DIR)/wine/windows"
 
-.PHONY: all windows native clean
+.PHONY: all wine-builtin wine-linux wine-osx native-linux native-osx
 .DELETE_ON_ERROR:
 all: wine-builtin native-linux
 wine-builtin: shmbridge-builtin.dll
@@ -69,4 +69,4 @@ shmbridge-osx.so: shmbridge-unix.c common.h posix-macos-sem-timedwait.h
 		-o $@
 
 clean:
-	rm -f shmbridge.dll shmbridge.so shmbridge-compat.dll
+	rm -f shmbridge-builtin.dll shmbridge-linux.dll shmbridge-osx.dll shmbridge-linux.so shmbridge-osx.so
