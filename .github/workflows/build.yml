@@ -21,7 +21,7 @@ jobs:
 
       - name: Build project
         run: |
-          make WINE_DIR=/opt/wine-staging wine-linux wine-builtin native-linux
+          make WINE_DIR=/opt/wine-staging BUILTIN=1 wine-linux native-linux
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
