@@ -11,7 +11,7 @@ SHMBRIDGE_SO_OSX ?= shmbridge-osx.so
 WINE_CC ?= $(WINE_DIR)/bin/winegcc
 MINGW_CC ?= x86_64-w64-mingw32
 NATIVE_CC ?= cc
-VERSION ?= 0.0.1
+VERSION ?= 1.1.0
 CFLAGS ?= -O2 -Wall -Wextra
 LDFLAGS ?=
 
