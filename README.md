@@ -20,9 +20,18 @@ Makefile. The Makefile contains multiple targets:
   for Linux and for macOS, but they should be named differently and put
   in different locations with their corresponding native files to
   prevent Linux from trying to load an OSX native and vice versa.
-- `wine-linux` and `wine-osx` both build a PE DLL for use with WINE versions >= 11.2 without
-  special shenanigans. They are named differently as they each try to
-  load their respective platform's native .so file.
+- `wine-linux` and `wine-osx` both build a PE DLL. When `BUILTIN=1` is
+  set, the DLL is marked as a WINE built-in for use with WINE versions <
+  11.2. This requires the directory with the DLL to be added to the
+  `WINEDLLPATH` environment variable. The DLL is the same for Linux and
+  macOS, but the name is important for WINE's loading semantics. In
+  particular, renaming the file does not change what .so WINE tries to
+  load, which causes issues.
+
+  When built without `BUILTIN=1`, the DLLs are built for use with WINE
+  versions >= 11.2 without special shenanigans. They are named
+  differently as they each try to load their respective platform's
+  native .so file.
 
 ## Usage
 For WINE >= 11.2, the PE .DLL file automatically tries to load the
@@ -38,9 +47,7 @@ Linux and macOS build. However, because it is marked as a WINE built-in,
 the folder which contains it must be added to the `WINEDLLPATH`
 environment variable, otherwise it will not be loaded. In addition, a
 `.so` file with the same name must be present which WINE attempts to
-load automatically. Thus, you should copy `shmbridge-builtin.dll` to two
-files, `shmbridge-{linux,osx}.dll`, and use the two separate native
-builds. The following schemes work:
+load automatically. The following schemes work:
 
 ```
 WINEDLLPATH/shmbridge-linux{.dll,.so}

@@ -91,7 +91,7 @@ jobs:
         run: |
           # CrossOver WINE is still just 11.0, so we can't build the new
           # unixlib version.
-          make NATIVE_CC=clang WINE_DIR=$WINE_SDK native-osx
+          make NATIVE_CC=clang WINE_DIR=$WINE_SDK BUILTIN=1 wine-osx native-osx
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
